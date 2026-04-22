@@ -18,15 +18,52 @@ Here are some ideas to get you started:
 
 <p align="left">
   <img src="https://img.shields.io/badge/Developed%20By-ZKG-blue?style=for-the-badge&logo=github" />
-  <img src="https://img.shields.io/badge/AI--Model-ProNax%20AI-red?style=for-the-badge&logo=openai" />
-  <img src="https://img.shields.io/badge/Architecture-Modular-yellow?style=for-the-badge" />
+  <img src="https://img.shields.io/badge/Project-ProNax%20AI-red?style=for-the-badge&logo=openai" />
   <img src="https://img.shields.io/badge/Language-Rust-orange?style=for-the-badge&logo=rust" />
-  <img src="https://img.shields.io/badge/Safety-Local%20First-green?style=for-the-badge&logo=shield" />
+  <img src="https://img.shields.io/badge/Inference-Local%20Only-green?style=for-the-badge&logo=shield" />
+  <img src="https://img.shields.io/badge/Platform-Windows%20%7C%20Linux%20%7C%20macOS-lightgrey?style=for-the-badge" />
 </p>
 
----
-
-## 🏷️ Framework Tags
-`#ArtificialIntelligence` `#RustLang` `#MachineLearning` `#LocalInference` `#ProNaxAI` `#ZKG-Dev` `#ModelConversion` `#PrivacyFirst`
+> **ProNax AI** is a high-performance, modular AI framework engineered for seamless local model execution and advanced tensor conversions. Built with a focus on speed, privacy, and multi-model compatibility.
 
 ---
+
+## 👨‍💻 Developed By
+**ZKG** ([@ZKG-Dev](https://github.com/Pronax-Ai))
+*Bringing powerful AI capabilities directly to local hardware.*
+
+---
+
+## 🌟 Key Features
+
+* **Multi-Model Intelligence:** Support for Llama 4, Gemma 4, Qwen 3, DeepSeek, and Mistral architectures.
+* **Advanced Tokenization:** Optimized BPE, SentencePiece, and WordPiece processing.
+* **Local Execution:** Native **Ollama** integration for private model serving.
+* **Tensor Conversion:** Seamlessly convert between Safetensors, PyTorch, and GGUF.
+* **Hardware Acceleration:** GPU/CPU detection for optimized local inference.
+
+---
+
+## 🛠 Project Structure & Modules
+
+| Module | Purpose | Keywords |
+| :--- | :--- | :--- |
+| **`app/`** | UI/UX & Webview | `frontend`, `interface`, `app-core` |
+| **`convert/`** | Model Weight Conversion | `safetensors`, `gguf`, `pytorch-converter` |
+| **`model/`** | Neural Architectures | `llama`, `gemma`, `transformer-models` |
+| **`server/`** | Inference API Server | `rest-api`, `openai-compat`, `endpoint` |
+| **`ml/nn/`** | Core Math & Ops | `attention`, `rope`, `neural-ops` |
+
+---
+
+## 🚀 Getting Started
+
+### Prerequisites
+* **Rust Compiler** (Latest Stable)
+* **Ollama Application** installed on your laptop.
+
+### Installation
+```bash
+git clone [https://github.com/Pronax-Ai/pronax-ai.git](https://github.com/Pronax-Ai/pronax-ai.git)
+cd pronax-ai
+cargo build --release
