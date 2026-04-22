@@ -242,9 +242,13 @@ See [LICENSE](./LICENSE) for full details.
 
 <div align="center">
 
-<img src="https://capsule-render.vercel.app/api?type=rect&color=0:1a1a2e,100:000000&height=100&section=footer&text=Built%20with%20⚡%20by%20ZKG&fontSize=30&fontColor=00d4ff&fontAlignY=65&animation=fadeIn" />
+<a href="https://github.com/ZKG-786">
+  <img src="https://capsule-render.vercel.app/api?type=rect&color=0:1a1a2e,100:000000&height=100&section=footer&text=Built%20with%20⚡%20by%20ZKG&fontSize=30&fontColor=00d4ff&fontAlignY=65&animation=fadeIn" />
+</a>
 
 **⭐ Star this repository to fuel the AI revolution!**
+
+Crafted with ❤️ by **[ZKG](https://github.com/ZKG-786)**
 
 `#RustForAI` `#OpenSourceAI` `#DeveloperTools` `#NextGenInference`
 
