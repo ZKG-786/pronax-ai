@@ -1,0 +1,11 @@
+blank_issues_enabled: false
+contact_links:
+  - name: 💬 GitHub Discussions
+    url: https://github.com/ProNax-Ai/pronax-ai/discussions
+    about: For general questions, ideas, and community chat
+  - name: 📧 Security Issues
+    url: https://github.com/ProNax-Ai/pronax-ai/security/advisories
+    about: Please report security vulnerabilities here
+  - name: 📖 Documentation
+    url: https://github.com/ProNax-Ai/pronax-ai#readme
+    about: Check the README for usage instructions
