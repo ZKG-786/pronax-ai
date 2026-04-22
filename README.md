@@ -36,28 +36,37 @@ Here are some ideas to get you started:
 
 ## 🌟 Key Features
 
-* **Multi-Model Intelligence:** Support for Llama 4, Gemma 4, Qwen 3, DeepSeek, and Mistral architectures.
-* **Advanced Tokenization:** Optimized BPE, SentencePiece, and WordPiece processing.
+* **Multi-Model Intelligence:** Support for **Llama 4**, **Gemma 4**, **Qwen 3**, **DeepSeek**, and **Mistral** architectures.
+* **Advanced Tokenization:** Optimized **BPE**, **SentencePiece**, and **WordPiece** processing.
 * **Local Execution:** Native **Ollama** integration for private model serving.
-* **Tensor Conversion:** Seamlessly convert between Safetensors, PyTorch, and GGUF.
-* **Hardware Acceleration:** GPU/CPU detection for optimized local inference.
+* **Tensor Conversion:** Seamlessly convert between **Safetensors**, **PyTorch**, and **GGUF**.
+* **Hardware Acceleration:** Native GPU/CPU detection for optimized local inference.
 
 ---
 
 ## 🛠 Project Structure & Modules
 
-| Module | Purpose | Keywords |
+| Module | Purpose | Search Keywords |
 | :--- | :--- | :--- |
-| **`app/`** | UI/UX & Webview | `frontend`, `interface`, `app-core` |
-| **`convert/`** | Model Weight Conversion | `safetensors`, `gguf`, `pytorch-converter` |
-| **`model/`** | Neural Architectures | `llama`, `gemma`, `transformer-models` |
-| **`server/`** | Inference API Server | `rest-api`, `openai-compat`, `endpoint` |
-| **`ml/nn/`** | Core Math & Ops | `attention`, `rope`, `neural-ops` |
+| **`app/`** | UI/UX & Webview | `frontend`, `interface`, `gui`, `webview` |
+| **`convert/`** | Model Weight Conversion | `safetensors`, `gguf`, `pytorch`, `weights` |
+| **`model/`** | Neural Architectures | `llama`, `gemma`, `transformers`, `llm-core` |
+| **`server/`** | Inference API Server | `rest-api`, `openai-api`, `endpoint`, `backend` |
+| **`ml/nn/`** | Core Math & Ops | `attention`, `rope`, `linear-algebra`, `cuda` |
 
 ---
 
 ## 🚀 Getting Started
 
+### Prerequisites
+* **Rust Compiler** (Latest Stable)
+* **Ollama Application** installed on your laptop.
+
+### Installation
+```bash
+git clone [https://github.com/Pronax-Ai/pronax-ai.git](https://github.com/Pronax-Ai/pronax-ai.git)
+cd pronax-ai
+cargo build --release
 ### Prerequisites
 * **Rust Compiler** (Latest Stable)
 * **Ollama Application** installed on your laptop.
