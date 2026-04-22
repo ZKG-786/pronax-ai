@@ -1,0 +1,1 @@
+pub struct PronaxGlm47Renderer;

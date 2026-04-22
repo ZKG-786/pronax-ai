@@ -1,0 +1,1 @@
+pub struct PronaxDeepseek2Model;

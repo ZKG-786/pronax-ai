@@ -1,0 +1,1 @@
+pub struct PronaxLfm2Renderer;

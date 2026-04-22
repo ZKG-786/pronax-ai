@@ -1,0 +1,1 @@
+pub struct PronaxQwen3vlText;

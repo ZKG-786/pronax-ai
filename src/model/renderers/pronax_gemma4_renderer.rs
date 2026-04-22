@@ -1,0 +1,1 @@
+pub struct PronaxGemma4Renderer;
