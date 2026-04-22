@@ -1,8 +1,20 @@
+//! ProNax Gemma4 - Advanced 3D Multimodal AI Model
+
 use crate::convert::pronax_converter_core::ConversionCoordinate;
 use crate::fs::ggml::pronax_ggml_types::SpatialTensorMetadata;
 use crate::kvcache::pronax_kvcache_causal::CausalKVCache;
 use crate::model::pronax_model_input::{NeuralBatch, NeuralInput, MultimodalData};
 use crate::tokenizer::pronax_sentencepiece::NeuralSentencePieceTokenizer;
+use crate::model::gemma4::pronax_gemma4_audio::{
+    PronaxAudioEncoder3D,
+    PronaxAudioHyperparams3D,
+    PronaxAudioTextProjector3D,
+};
+use crate::model::gemma4::pronax_gemma4_vision::{
+    PronaxVisionEncoder3D,
+    PronaxVisionHyperparams3D,
+    PronaxVisionTextProjector3D,
+};
 
 /// Gemma4 model errors
 #[derive(Debug, Clone)]
@@ -1117,41 +1129,216 @@ impl Gemma4Model3D {
     }
 }
 
-/// Vision model (placeholder for full implementation)
+/// Vision model with professional 3D encoder
 pub struct Gemma4VisionModel3D {
     pub config: Gemma4Config3D,
+    pub encoder: PronaxVisionEncoder3D,
+    pub projector: PronaxVisionTextProjector3D,
     pub spatial_position: ConversionCoordinate,
 }
 
 impl Gemma4VisionModel3D {
-    pub fn new(config: &Gemma4Config3D) -> Self {
-        Self {
+    pub fn new(config: &Gemma4Config3D) -> Result<Self, Gemma4Error> {
+        let vision_params = PronaxVisionHyperparams3D {
+            spatial_width: config.image_size,
+            spatial_height: config.image_size,
+            channel_depth: 3,
+            guidance_strength: config.spatial_guidance,
+            embedding_dim: config.vision_hidden_size,
+            attention_heads: config.vision_num_heads,
+            head_dimension: config.vision_hidden_size / config.vision_num_heads,
+            patch_size: config.vision_patch_size,
+            transformer_layers: config.vision_num_layers,
+            rope_theta: 100.0,
+            max_position_embeddings: 256,
+            merge_factor: config.vision_merge_factor,
+            text_embedding_dim: config.hidden_size,
+            epsilon: config.eps,
+            layer_scale_init: 0.0,
+            spatial_depth: config.spatial_depth,
+            spatial_guidance: config.spatial_guidance,
+        };
+        
+        let encoder = PronaxVisionEncoder3D::new(vision_params)
+            .map_err(|e| Gemma4Error::VisionError(e.to_string()))?;
+        
+        let projector = PronaxVisionTextProjector3D::new(
+            config.vision_hidden_size,
+            config.hidden_size,
+        );
+        
+        Ok(Self {
             config: *config,
+            encoder,
+            projector,
             spatial_position: ConversionCoordinate::standard(),
-        }
+        })
+    }
+    
+    /// Encode image pixels to text embeddings
+    pub fn encode_vision(
+        &mut self,
+        pixel_values: &[f32],
+        num_patches_x: usize,
+        num_patches_y: usize,
+    ) -> Result<Vec<f32>, Gemma4Error> {
+        let vision_features = self.encoder.encode_vision_zero_copy(pixel_values, num_patches_x, num_patches_y)
+            .map_err(|e| Gemma4Error::VisionError(e.to_string()))?;
+        
+        let vision_params = PronaxVisionHyperparams3D {
+            spatial_width: self.config.image_size,
+            spatial_height: self.config.image_size,
+            channel_depth: 3,
+            guidance_strength: self.config.spatial_guidance,
+            embedding_dim: self.config.vision_hidden_size,
+            attention_heads: self.config.vision_num_heads,
+            head_dimension: self.config.vision_hidden_size / self.config.vision_num_heads,
+            patch_size: self.config.vision_patch_size,
+            transformer_layers: self.config.vision_num_layers,
+            rope_theta: 100.0,
+            max_position_embeddings: 256,
+            merge_factor: self.config.vision_merge_factor,
+            text_embedding_dim: self.config.hidden_size,
+            epsilon: self.config.eps,
+            layer_scale_init: 0.0,
+            spatial_depth: self.config.spatial_depth,
+            spatial_guidance: self.config.spatial_guidance,
+        };
+        
+        let text_embeddings = self.projector.project_with_pooling(
+            &vision_features,
+            num_patches_x,
+            num_patches_y,
+            self.config.vision_merge_factor,
+            &vision_params,
+        ).map_err(|e| Gemma4Error::VisionError(e.to_string()))?;
+        
+        Ok(text_embeddings)
     }
     
     fn estimate_parameters(&self) -> usize {
-        self.config.vision_hidden_size * self.config.vision_num_layers * 1000
+        // Patch embedding
+        let patch_embd = self.config.vision_patch_size * self.config.vision_patch_size * 3 * self.config.vision_hidden_size;
+        
+        // Position embeddings
+        let num_patches = (self.config.image_size / self.config.vision_patch_size).pow(2);
+        let pos_embd = num_patches * self.config.vision_hidden_size * 2;
+        
+        // Vision transformer layers
+        let vision_layer = self.config.vision_hidden_size * self.config.vision_hidden_size * 4 + // Attention
+            self.config.vision_hidden_size * (self.config.vision_hidden_size * 4) * 2 + // MLP
+            self.config.vision_hidden_size * 8; // Norms
+        
+        let total = patch_embd + pos_embd + 
+            self.config.vision_num_layers * vision_layer +
+            self.config.vision_hidden_size * self.config.hidden_size; // Projector
+        
+        total
     }
 }
 
-/// Audio model (placeholder for full implementation)
+/// Audio model with professional 3D encoder
 pub struct Gemma4AudioModel3D {
     pub config: Gemma4Config3D,
+    pub encoder: PronaxAudioEncoder3D,
+    pub projector: PronaxAudioTextProjector3D,
     pub spatial_position: ConversionCoordinate,
 }
 
 impl Gemma4AudioModel3D {
-    pub fn new(config: &Gemma4Config3D) -> Self {
-        Self {
+    pub fn new(config: &Gemma4Config3D) -> Result<Self, Gemma4Error> {
+        let audio_params = PronaxAudioHyperparams3D {
+            spectral_width: config.audio_mel_bins,
+            temporal_height: 100,
+            feature_depth: 1,
+            guidance_strength: config.spatial_guidance,
+            embedding_dim: config.audio_hidden_size,
+            attention_heads: config.audio_num_heads,
+            head_dimension: config.audio_hidden_size / config.audio_num_heads,
+            feedforward_dim: config.audio_hidden_size * 4,
+            transformer_layers: config.audio_num_layers,
+            convolution_kernel: 5,
+            chunk_span: config.audio_chunk_size,
+            context_past: config.audio_max_past,
+            context_future: config.audio_max_future,
+            total_context: config.audio_chunk_size + config.audio_max_past + config.audio_max_future,
+            logit_cap: 50.0,
+            residual_scale: 0.5,
+            gradient_threshold: 1e10,
+            epsilon: config.eps,
+            spatial_depth: config.spatial_depth,
+            spatial_guidance: config.spatial_guidance,
+        };
+        
+        let encoder = PronaxAudioEncoder3D::new(audio_params)
+            .map_err(|e| Gemma4Error::AudioError(e.to_string()))?;
+        
+        let projector = PronaxAudioTextProjector3D::new(
+            config.audio_hidden_size,
+            config.hidden_size,
+        );
+        
+        Ok(Self {
             config: *config,
+            encoder,
+            projector,
             spatial_position: ConversionCoordinate::standard(),
-        }
+        })
+    }
+    
+    /// Encode audio mel spectrogram to text embeddings
+    pub fn encode_audio(
+        &mut self,
+        mel_spectrogram: &[f32],
+        num_frames: usize,
+    ) -> Result<Vec<f32>, Gemma4Error> {
+        let audio_features = self.encoder.encode_audio_zero_copy(mel_spectrogram, num_frames)
+            .map_err(|e| Gemma4Error::AudioError(e.to_string()))?;
+        
+        let audio_params = PronaxAudioHyperparams3D {
+            spectral_width: self.config.audio_mel_bins,
+            temporal_height: 100,
+            feature_depth: 1,
+            guidance_strength: self.config.spatial_guidance,
+            embedding_dim: self.config.audio_hidden_size,
+            attention_heads: self.config.audio_num_heads,
+            head_dimension: self.config.audio_hidden_size / self.config.audio_num_heads,
+            feedforward_dim: self.config.audio_hidden_size * 4,
+            transformer_layers: self.config.audio_num_layers,
+            convolution_kernel: 5,
+            chunk_span: self.config.audio_chunk_size,
+            context_past: self.config.audio_max_past,
+            context_future: self.config.audio_max_future,
+            total_context: self.config.audio_chunk_size + self.config.audio_max_past + self.config.audio_max_future,
+            logit_cap: 50.0,
+            residual_scale: 0.5,
+            gradient_threshold: 1e10,
+            epsilon: self.config.eps,
+            spatial_depth: self.config.spatial_depth,
+            spatial_guidance: self.config.spatial_guidance,
+        };
+        
+        let text_embeddings = self.projector.project_to_text_zero_copy(&audio_features, &audio_params)
+            .map_err(|e| Gemma4Error::AudioError(e.to_string()))?;
+        
+        Ok(text_embeddings)
     }
     
     fn estimate_parameters(&self) -> usize {
-        self.config.audio_hidden_size * self.config.audio_num_layers * 1000
+        // SSCP parameters
+        let sscp_params = 3 * 3 * 1 * 64 + 3 * 3 * 64 * 128;
+        
+        // Conformer layer parameters
+        let conformer_layer = self.config.audio_hidden_size * self.config.audio_hidden_size * 4 + // Attention
+            self.config.audio_hidden_size * (self.config.audio_hidden_size * 4) * 2 + // FFW
+            self.config.audio_hidden_size * self.config.audio_hidden_size * 2 + // Conv
+            self.config.audio_hidden_size * 8; // Norms
+        
+        let total = sscp_params + 
+            self.config.audio_num_layers * conformer_layer +
+            self.config.audio_hidden_size * self.config.hidden_size; // Projector
+        
+        total
     }
 }
 

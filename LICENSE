@@ -1,6 +1,12 @@
 MIT License
 
-Copyright (c) 2026 ProNax-AI Team
+Copyright (c) 2026 ZKG (Lead Architect & Developer)
+Copyright (c) 2026 ProNax-Ai Organization
+
+===========================================================================
+PROXNAX-AI: HIGH-PERFORMANCE LOCAL INFERENCE FRAMEWORK
+Official Repository: https://github.com/Pronax-Ai/pronax-ai
+===========================================================================
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -19,3 +25,7 @@ AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
 LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
+
+---------------------------------------------------------------------------
+"Empowering Local Intelligence." - ZKG
+---------------------------------------------------------------------------
